@@ -35,14 +35,6 @@ const Movies = db.define('movies', {
     watched: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
-    },
-    inserted_at: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
-    },
-    updated_at: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW
     }
 }, {
     tableName: 'movies',

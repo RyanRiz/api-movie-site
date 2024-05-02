@@ -45,7 +45,9 @@ async function getDirectorById(req, res) {
         const { id } = req.params;
         const director = await Directors.findByPk(id);
         if (!director) {
-            return res.status(404).json({ error: 'Director not found' });
+            return res.status(404).json({ 
+                status: 'error',
+                error: 'Director tidak ditemukan' });
         }
         res.status(200).json({
             status: 'success',
@@ -65,7 +67,7 @@ async function editDirectorById(req, res) {
         const { name, age, birthdate, country } = req.body;
         const director = await Directors.findByPk(id);
         if (!director) {
-            return res.status(404).json({ error: 'Director not found' });
+            return res.status(404).json({ error: 'Director tidak ditemukan' });
         }
         await director.update({
             name,
@@ -75,7 +77,7 @@ async function editDirectorById(req, res) {
         });
         res.status(200).json({
             status: 'success',
-            message: 'Director berhasil diupdate',
+            message: 'Director berhasil diperbarui',
             data: director
         });
     } catch (error) {
@@ -91,13 +93,12 @@ async function deleteDirectorById(req, res) {
         const { id } = req.params;
         const director = await Directors.findByPk(id);
         if (!director) {
-            return res.status(404).json({ error: 'Director not found' });
+            return res.status(404).json({ error: 'Director tidak ditemukan' });
         }
         await director.destroy();
-        res.status(204).json({
+        res.status(200).json({
             status: 'success',
             message: 'Director berhasil dihapus'
-        
         });
     } catch (error) {
         res.status(500).json({ 
@@ -107,4 +108,22 @@ async function deleteDirectorById(req, res) {
     }
 }
 
-export default { getAllDirectors, createDirector, getDirectorById, editDirectorById, deleteDirectorById };
+async function getDirectorMovies(req, res) {
+    try {
+        const { id } = req.params;
+        const director = await Directors.findByPk(id, {
+            include: 'movies'
+        });
+        if (!director) {
+            return res.status(404).json({ error: 'Director tidak ditemukan' });
+        }
+        res.status(200).json({
+            status: 'success',
+            data: director
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+export default { getAllDirectors, createDirector, getDirectorById, editDirectorById, deleteDirectorById, getDirectorMovies };

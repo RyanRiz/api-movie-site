@@ -32,7 +32,11 @@ async function createMovie(req, res) {
             duration,
             watched
         });
-        res.status(201).json(movie);
+        res.status(201).json({
+            status: 'success',
+            message: 'Movie berhasil ditambahkan',
+            data: movie
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -41,11 +45,35 @@ async function createMovie(req, res) {
 async function getMovieById(req, res) {
     try {
         const { id } = req.params;
-        const movie = await Movie.findByPk(id);
+        const movie = await Movies.findByPk(id, {
+            attributes: ['id', 'title', 'rating', 'year', 'description', 'genre', 'duration', 'watched'],
+            include: [{
+                model: Directors,
+                attributes: ['name']
+            }]
+        });
         if (!movie) {
-            return res.status(404).json({ error: 'Movie not found' });
+            return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
-        res.status(200).json(movie);
+
+        const directorName = movie.director.name;
+
+        const movieData = {
+            id: movie.id,
+            title: movie.title,
+            rating: movie.rating,
+            year: movie.year,
+            description: movie.description,
+            genre: movie.genre,
+            duration: movie.duration,
+            watched: movie.watched,
+            director: directorName
+        };
+
+        res.status(200).json({
+            status: 'success',
+            data: movieData
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -54,22 +82,25 @@ async function getMovieById(req, res) {
 async function editMovieById(req, res) {
     try {
         const { id } = req.params;
-        const { title, rating, year, director, description, genre, duration, watched } = req.body;
-        const movie = await Movie.findByPk(id);
+        const { title, rating, year, description, genre, duration, watched } = req.body;
+        const movie = await Movies.findByPk(id);
         if (!movie) {
-            return res.status(404).json({ error: 'Movie not found' });
+            return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
         await movie.update({
             title,
             rating,
             year,
-            director,
             description,
             genre,
             duration,
             watched
         });
-        res.status(200).json(movie);
+        res.status(200).json({
+            status: 'success',
+            message: 'Movie berhasil diperbarui',
+            data: movie
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -78,12 +109,15 @@ async function editMovieById(req, res) {
 async function deleteMovieById(req, res) {
     try {
         const { id } = req.params;
-        const movie = await Movie.findByPk(id);
+        const movie = await Movies.findByPk(id);
         if (!movie) {
-            return res.status(404).json({ error: 'Movie not found' });
+            return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
         await movie.destroy();
-        res.status(204).end();
+        res.status(200).json({
+            status: 'success',
+            message: 'Movie berhasil dihapus'
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
