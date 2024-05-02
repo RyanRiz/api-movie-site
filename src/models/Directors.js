@@ -4,7 +4,7 @@ import Movies from "./Movies.js";
 
 const Directors = db.define('directors', {
     id: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         primaryKey: true
     },
     name: {
@@ -20,9 +20,23 @@ const Directors = db.define('directors', {
     country: {
         type: Sequelize.STRING
     }
+}, {
+    tableName: 'directors',
+    timestamps: false,
+    underscored: true
 });
 
-Directors.hasMany(Movies, { foreignKey: 'director_id' });
-Movies.belongsTo(Directors, { foreignKey: 'director_id' });
+db.sync();
+
+Directors.hasMany(Movies, { 
+    foreignKey: 'director_id',
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT"
+});
+
+Movies.belongsTo(Directors, {
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT"
+ });
 
 export default Directors;

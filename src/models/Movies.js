@@ -2,10 +2,9 @@ import { Sequelize } from "sequelize";
 import db from "../configs/db.config.js";
 
 const Movies = db.define('movies', {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
+    movie_id: {
+        type: Sequelize.UUID,
+        primaryKey: true
     },
     title: {
         type: Sequelize.STRING,
@@ -15,13 +14,16 @@ const Movies = db.define('movies', {
         type: Sequelize.FLOAT
     },
     year: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false
     },
     director_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.UUID,
+        allowNull: false
     },
     description: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
     },
     genre: {
         type: Sequelize.STRING
@@ -30,7 +32,8 @@ const Movies = db.define('movies', {
         type: Sequelize.INTEGER
     },
     watched: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
     },
     inserted_at: {
         type: Sequelize.DATE,
@@ -40,6 +43,11 @@ const Movies = db.define('movies', {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
     }
+}, {
+    tableName: 'movies',
+    underscored: true
 });
+
+db.sync();
 
 export default Movies;
