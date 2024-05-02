@@ -2,9 +2,10 @@ import { Sequelize } from "sequelize";
 import db from "../configs/db.config.js";
 
 const Movies = db.define('movies', {
-    movie_id: {
+    id: {
         type: Sequelize.UUID,
-        primaryKey: true
+        primaryKey: true,
+        defaultValue: Sequelize.UUIDV4
     },
     title: {
         type: Sequelize.STRING,

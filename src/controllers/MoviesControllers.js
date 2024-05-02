@@ -1,18 +1,19 @@
-import { Sequelize } from "sequelize";
 import Directors from "../models/Directors.js";
 import Movies from "../models/Movies.js";
-import { nanoid } from "nanoid";
 
 async function getAllMovies(req, res) {
     try {
         const data = await Movies.findAll({
-            attributes: ['movie_id', 'title', 'rating', 'year', 'description', 'genre', 'duration', 'watched'],
+            attributes: ['id', 'title', 'rating', 'year', 'description', 'genre', 'duration', 'watched'],
             include: {
                 model: Directors,
                 attributes: ['name', 'age', 'birthdate', 'country']
             }
         });
-        res.status(200).json(data);
+        res.status(200).json({
+            status: 'success',
+            data: data
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -21,9 +22,7 @@ async function getAllMovies(req, res) {
 async function createMovie(req, res) {
     try {
         const { title, rating, year, director_id, description, genre, duration, watched } = req.body;
-        const movie_id = nanoid(16);
         const movie = await Movies.create({
-            movie_id,
             title,
             rating,
             year,

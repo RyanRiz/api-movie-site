@@ -5,6 +5,7 @@ import Movies from "./Movies.js";
 const Directors = db.define('directors', {
     id: {
         type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
         primaryKey: true
     },
     name: {

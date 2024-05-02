@@ -1,5 +1,4 @@
 import Directors from "../models/Directors.js";
-import { nanoid } from "nanoid";
 
 async function getAllDirectors(req, res) {
     try {
@@ -22,9 +21,7 @@ async function createDirector(req, res) {
     try {
         console.log("Request Body:", req.body);
         const { name, age, birthdate, country } = req.body;
-        const id = nanoid(16);
         const director = await Directors.create({
-            id: id,
             name: name,
             age: age,
             birthdate: birthdate,
