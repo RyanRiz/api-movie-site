@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import db from "../configs/db.config";
+import db from "../configs/db.config.js";
 
 const Genres = db.define('genres', {
     id: {
@@ -11,4 +11,11 @@ const Genres = db.define('genres', {
         type: Sequelize.STRING,
         allowNull: false
     }
+}, {
+    tableName: 'genres',
+    timestamps: false
 });
+
+db.sync();
+
+export default Genres;

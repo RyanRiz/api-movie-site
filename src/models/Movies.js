@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import db from "../configs/db.config.js";
+import Genres from "./Genres.js";
 
 const Movies = db.define('movies', {
     id: {
@@ -26,9 +27,6 @@ const Movies = db.define('movies', {
         type: Sequelize.STRING,
         allowNull: false
     },
-    genre: {
-        type: Sequelize.STRING
-    },
     duration: {
         type: Sequelize.INTEGER
     },
@@ -42,5 +40,15 @@ const Movies = db.define('movies', {
 });
 
 db.sync();
+
+Movies.belongsToMany(Genres, { 
+    through: 'movie_genres',
+    foreignKey: 'movie_id'
+});
+
+Genres.belongsToMany(Movies, {
+    through: 'movie_genres',
+    foreignKey: 'genre_id'
+});
 
 export default Movies;

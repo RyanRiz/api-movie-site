@@ -1,6 +1,7 @@
 import express from 'express';
 import DirectorsControllers from '../controllers/DirectorsControllers.js';
 import MoviesControllers from '../controllers/MoviesControllers.js';
+import GenresControllers from '../controllers/GenresControllers.js';
 
 const router = express.Router();
 const route = "/api";
@@ -19,5 +20,13 @@ router.post(`${route}/movies`, MoviesControllers.createMovie);
 router.get(`${route}/movies/:id`, MoviesControllers.getMovieById);
 router.put(`${route}/movies/:id`, MoviesControllers.editMovieById);
 router.delete(`${route}/movies/:id`, MoviesControllers.deleteMovieById);
+
+// Genres Routes
+router.get(`${route}/genres`, GenresControllers.getAllGenres);
+router.post(`${route}/genres`, GenresControllers.createGenre);
+router.get(`${route}/genres/:id`, GenresControllers.getGenreById);
+router.put(`${route}/genres/:id`, GenresControllers.editGenreById);
+router.delete(`${route}/genres/:id`, GenresControllers.deleteGenreById);
+router.get(`${route}/genres/:id/movies`, GenresControllers.getGenreMovies);
 
 export default router;

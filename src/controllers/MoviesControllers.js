@@ -1,18 +1,40 @@
 import Directors from "../models/Directors.js";
 import Movies from "../models/Movies.js";
+import Genres from "../models/Genres.js";
 
 async function getAllMovies(req, res) {
     try {
         const data = await Movies.findAll({
-            attributes: ['id', 'title', 'rating', 'year', 'description', 'genre', 'duration', 'watched'],
-            include: {
-                model: Directors,
-                attributes: ['name', 'age', 'birthdate', 'country']
-            }
+            attributes: ['id', 'title', 'rating', 'year', 'description', 'duration', 'watched'],
+            include: [
+                {
+                    model: Directors,
+                    attributes: ['name', 'age', 'birthdate', 'country'],
+                },
+                {
+                    model: Genres,
+                    attributes: ['genre_name']
+                }
+            ]
         });
+
+        const movieData = data.map((movie) => {
+            return {
+                id: movie.id,
+                title: movie.title,
+                rating: movie.rating,
+                year: movie.year,
+                description: movie.description,
+                duration: movie.duration,
+                watched: movie.watched,
+                director: movie.director.name,
+                genre: movie.genres.map((genre) => genre.genre_name)
+            };
+        });
+
         res.status(200).json({
             status: 'success',
-            data: data
+            data: movieData
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -28,10 +50,12 @@ async function createMovie(req, res) {
             year,
             director_id,
             description,
-            genre,
             duration,
             watched
         });
+
+        await movie.setGenres(genre);
+
         res.status(201).json({
             status: 'success',
             message: 'Movie berhasil ditambahkan',
@@ -46,17 +70,19 @@ async function getMovieById(req, res) {
     try {
         const { id } = req.params;
         const movie = await Movies.findByPk(id, {
-            attributes: ['id', 'title', 'rating', 'year', 'description', 'genre', 'duration', 'watched'],
+            attributes: ['id', 'title', 'rating', 'year', 'description', 'duration', 'watched'],
             include: [{
                 model: Directors,
                 attributes: ['name']
             }]
         });
+
         if (!movie) {
             return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
 
-        const directorName = movie.director.name;
+        const genres = await movie.getGenres();
+        movie.genres = genres.map((genre) => genre.genre_name);
 
         const movieData = {
             id: movie.id,
@@ -64,10 +90,10 @@ async function getMovieById(req, res) {
             rating: movie.rating,
             year: movie.year,
             description: movie.description,
-            genre: movie.genre,
             duration: movie.duration,
             watched: movie.watched,
-            director: directorName
+            director: movie.director.name,
+            genre: movie.genres
         };
 
         res.status(200).json({
@@ -84,9 +110,11 @@ async function editMovieById(req, res) {
         const { id } = req.params;
         const { title, rating, year, description, genre, duration, watched } = req.body;
         const movie = await Movies.findByPk(id);
+
         if (!movie) {
             return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
+
         await movie.update({
             title,
             rating,
@@ -96,6 +124,11 @@ async function editMovieById(req, res) {
             duration,
             watched
         });
+
+        if (genre && genre.length > 0) {
+            await movie.setGenres(genre);
+        }
+
         res.status(200).json({
             status: 'success',
             message: 'Movie berhasil diperbarui',
@@ -110,10 +143,13 @@ async function deleteMovieById(req, res) {
     try {
         const { id } = req.params;
         const movie = await Movies.findByPk(id);
+
         if (!movie) {
             return res.status(404).json({ error: 'Movie tidak ditemukan' });
         }
+        
         await movie.destroy();
+
         res.status(200).json({
             status: 'success',
             message: 'Movie berhasil dihapus'
