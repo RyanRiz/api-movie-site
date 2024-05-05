@@ -18,7 +18,9 @@ async function getAllGenres(req, res) {
 async function createGenre(req, res) {
     try {
         const { genre_name } = req.body;
-        const genre = await Genres.create({ genre_name: genre_name });
+        const genre = await Genres.create({ 
+            genre_name: genre_name
+        });
 
         res.status(201).json({
             status: 'success',
@@ -38,7 +40,8 @@ async function getGenreById(req, res) {
         if (!genre) {
             return res.status(404).json({ 
                 status: 'error',
-                error: 'Genre tidak ditemukan' });
+                error: 'Genre tidak ditemukan'
+            });
         }
 
         res.status(200).json({
@@ -65,10 +68,9 @@ async function editGenreById(req, res) {
                 error: 'Genre tidak ditemukan' });
         }
 
-        await Genres.update(
-            { genre_name: genre_name }, 
-            { where: { id: id } }
-            );
+        await genre.update({ 
+            genre_name: genre_name
+        });
 
         res.status(200).json({
             status: 'success',
@@ -93,7 +95,7 @@ async function deleteGenreById(req, res) {
                 error: 'Genre tidak ditemukan' });
         }
 
-        await Genres.destroy({ where: { id: id } });
+        await genre.destroy();
         
         res.status(200).json({
             status: 'success',

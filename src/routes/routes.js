@@ -2,15 +2,16 @@ import express from 'express';
 import DirectorsControllers from '../controllers/DirectorsControllers.js';
 import MoviesControllers from '../controllers/MoviesControllers.js';
 import GenresControllers from '../controllers/GenresControllers.js';
+import upload from '../middlewares/upload.js';
 
 const router = express.Router();
 const route = "/api";
 
 // Directors Routes
 router.get(`${route}/directors`, DirectorsControllers.getAllDirectors);
-router.post(`${route}/directors`, DirectorsControllers.createDirector);
+router.post(`${route}/directors`, upload.single("image"), DirectorsControllers.createDirector);
 router.get(`${route}/directors/:id`, DirectorsControllers.getDirectorById);
-router.put(`${route}/directors/:id`, DirectorsControllers.editDirectorById);
+router.put(`${route}/directors/:id`, upload.single("image"), DirectorsControllers.editDirectorById);
 router.delete(`${route}/directors/:id`, DirectorsControllers.deleteDirectorById);
 router.get(`${route}/directors/:id/movies`, DirectorsControllers.getDirectorMovies);
 

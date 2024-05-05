@@ -45,13 +45,13 @@ async function createMovie(req, res) {
     try {
         const { title, rating, year, director_id, description, genre, duration, watched } = req.body;
         const movie = await Movies.create({
-            title,
-            rating,
-            year,
-            director_id,
-            description,
-            duration,
-            watched
+            title: title,
+            rating: rating,
+            year: year,
+            director_id: director_id,
+            description: description,
+            duration:duration,
+            watched: watched
         });
 
         await movie.setGenres(genre);
@@ -116,13 +116,13 @@ async function editMovieById(req, res) {
         }
 
         await movie.update({
-            title,
-            rating,
-            year,
-            description,
-            genre,
-            duration,
-            watched
+            title: title,
+            rating: rating,
+            year: year,
+            description: description,
+            genre: genre,
+            duration: duration,
+            watched:watched
         });
 
         if (genre && genre.length > 0) {

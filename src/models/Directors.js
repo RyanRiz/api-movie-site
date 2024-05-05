@@ -20,6 +20,9 @@ const Directors = db.define('directors', {
     },
     country: {
         type: Sequelize.STRING
+    },
+    image_path: {
+        type: Sequelize.STRING
     }
 }, {
     tableName: 'directors',

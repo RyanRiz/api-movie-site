@@ -1,11 +1,13 @@
 import Directors from "../models/Directors.js";
 import Genres from "../models/Genres.js";
 import Movies from "../models/Movies.js";
+import fs from 'fs/promises';
+
 
 async function getAllDirectors(req, res) {
     try {
         const directors = await Directors.findAll({
-            attributes: ['id', 'name', 'age', 'birthdate', 'country']
+            attributes: ['id', 'name', 'age', 'birthdate', 'country', 'image_path']
         });
 
         res.status(200).json({
@@ -22,14 +24,22 @@ async function getAllDirectors(req, res) {
 
 async function createDirector(req, res) {
     try {
-        console.log("Request Body:", req.body);
+        const image = req.file ? req.file.path : null;
         const { name, age, birthdate, country } = req.body;
+
+        if (req.file === undefined || req.file === null) {
+            return res.status(400).json({
+                status: 'error',
+                error: 'Gambar harus diupload'
+            });
+        }
 
         const director = await Directors.create({
             name: name,
             age: age,
             birthdate: birthdate,
-            country: country
+            country: country,
+            image_path: image
         });
 
         res.status(201).json({
@@ -73,6 +83,7 @@ async function editDirectorById(req, res) {
     try {
         const { id } = req.params;
         const { name, age, birthdate, country } = req.body;
+        let imagePath;
 
         const director = await Directors.findByPk(id);
 
@@ -80,11 +91,28 @@ async function editDirectorById(req, res) {
             return res.status(404).json({ error: 'Director tidak ditemukan' });
         }
 
+        if (req.file === undefined || req.file === null) {
+            return res.status(400).json({
+                status: 'error',
+                error: 'Gambar harus diupload'
+            });
+        }
+
+        if (req.file) {
+            imagePath = req.file.path;
+
+            const oldImagePath = director.image_path;
+            if (oldImagePath) {
+                await fs.unlink(oldImagePath);
+            }
+        }
+
         await director.update({
-            name,
-            age,
-            birthdate,
-            country
+            name: name,
+            age: age,
+            birthdate: birthdate,
+            country: country,
+            image_path: imagePath
         });
 
         res.status(200).json({
@@ -148,6 +176,7 @@ async function getDirectorMovies(req, res) {
             age: director.age,
             birthdate: director.birthdate,
             country: director.country,
+            image_path: director.image_path,
             movies: director.movies.map(movie => ({
                 id: movie.id,
                 title: movie.title,
