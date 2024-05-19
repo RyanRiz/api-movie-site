@@ -1,11 +1,12 @@
 import express from 'express';
 import router from './src/routes/routes.js';
 import db from './src/configs/db.config.js';
-import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(cookieParser());
 app.use(router);
 
 try {
